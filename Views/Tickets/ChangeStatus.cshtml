@@ -1,0 +1,115 @@
+﻿@model EduSupport.Web.ViewModels.ChangeStatusViewModel
+
+@{
+    ViewData["Title"] = "Change Status";
+}
+
+<div class="page-header">
+
+    <div>
+        <div class="page-eyebrow">TICKET MANAGEMENT</div>
+        <h1>Change Status</h1>
+        <p class="page-subtitle">
+            Update the current stage of this ticket.
+        </p>
+    </div>
+
+    <a asp-action="Details"
+       asp-route-id="@Model.TicketId"
+       class="btn btn-outline">
+        ← Back
+    </a>
+
+</div>
+
+<div class="card form-card narrow-card">
+
+    <div class="card-header">
+
+        <div>
+            <h2>Status Update</h2>
+            <p>
+                Choose the appropriate workflow state.
+            </p>
+        </div>
+
+    </div>
+
+    <form asp-action="ChangeStatus"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               asp-for="TicketId" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="validation-summary">
+        </div>
+
+        <div class="form-group">
+
+            <label asp-for="Status"
+                   class="form-label">
+            </label>
+
+            <select asp-for="Status"
+                    asp-items="Html.GetEnumSelectList<EduSupport.Web.Models.Enums.TicketStatus>()"
+                    class="form-control">
+            </select>
+
+            <span asp-validation-for="Status"
+                  class="field-validation">
+            </span>
+
+        </div>
+
+        <div class="form-group">
+
+            <label asp-for="PendingReason"
+                   class="form-label">
+            </label>
+
+            <select asp-for="PendingReason"
+                    asp-items="Html.GetEnumSelectList<EduSupport.Web.Models.Enums.PendingReason>()"
+                    class="form-control">
+
+                <option value="">
+                    Select reason if pending
+                </option>
+
+            </select>
+
+            <span asp-validation-for="PendingReason"
+                  class="field-validation">
+            </span>
+
+            <div class="form-help">
+                A pending reason is required when the ticket
+                is waiting for another person or team.
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <a asp-action="Details"
+               asp-route-id="@Model.TicketId"
+               class="btn btn-outline">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Update Status
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

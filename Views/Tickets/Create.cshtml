@@ -1,0 +1,188 @@
+﻿@model EduSupport.Web.ViewModels.CreateTicketViewModel
+
+@{
+    ViewData["Title"] = "Create Ticket";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-eyebrow">SUPPORT</div>
+        <h1>Create Ticket</h1>
+        <p class="page-subtitle">
+            Tell us what you need help with.
+        </p>
+    </div>
+
+    <a asp-action="Index"
+       class="btn btn-outline">
+        ← Back to Tickets
+    </a>
+</div>
+
+<div class="form-layout">
+
+    <div class="card form-card">
+
+        <div class="card-header">
+            <div>
+                <h2>Ticket Information</h2>
+                <p>
+                    Provide enough detail so the support team can help you quickly.
+                </p>
+            </div>
+        </div>
+
+        <form asp-action="Create"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly"
+                 class="validation-summary">
+            </div>
+
+            <div class="form-group">
+
+                <label asp-for="Subject"
+                       class="form-label">
+                </label>
+
+                <input asp-for="Subject"
+                       class="form-control"
+                       placeholder="Example: Unable to download my ID card" />
+
+                <span asp-validation-for="Subject"
+                      class="field-validation">
+                </span>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label asp-for="CategoryId"
+                           class="form-label">
+                    </label>
+
+                    <select asp-for="CategoryId"
+                            asp-items="ViewBag.Categories"
+                            class="form-control">
+
+                        <option value="">
+                            Select category
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="CategoryId"
+                          class="field-validation">
+                    </span>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label asp-for="DepartmentId"
+                           class="form-label">
+                    </label>
+
+                    <select asp-for="DepartmentId"
+                            asp-items="ViewBag.Departments"
+                            class="form-control">
+
+                        <option value="">
+                            Select department
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="DepartmentId"
+                          class="field-validation">
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label asp-for="Priority"
+                       class="form-label">
+                </label>
+
+                <select asp-for="Priority"
+                        asp-items="Html.GetEnumSelectList<EduSupport.Web.Models.Enums.TicketPriority>()"
+                        class="form-control">
+                </select>
+
+                <span asp-validation-for="Priority"
+                      class="field-validation">
+                </span>
+
+                <div class="form-help">
+                    Select the urgency that best describes your request.
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label asp-for="Description"
+                       class="form-label">
+                </label>
+
+                <textarea asp-for="Description"
+                          class="form-control textarea-large"
+                          placeholder="Describe the issue, what happened, and any useful details...">
+                </textarea>
+
+                <span asp-validation-for="Description"
+                      class="field-validation">
+                </span>
+
+            </div>
+
+            <div class="form-actions">
+
+                <a asp-action="Index"
+                   class="btn btn-outline">
+                    Cancel
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    Submit Ticket
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <div class="card form-help-card">
+
+        <div class="help-icon">?</div>
+
+        <h3>Before submitting</h3>
+
+        <p>
+            Include specific information about your problem.
+            This helps the support team resolve your request faster.
+        </p>
+
+        <ul>
+            <li>Describe the problem clearly.</li>
+            <li>Include relevant dates or references.</li>
+            <li>Select the correct category.</li>
+            <li>Choose priority based on urgency.</li>
+        </ul>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

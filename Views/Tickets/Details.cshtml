@@ -1,0 +1,493 @@
+﻿@model EduSupport.Web.ViewModels.TicketDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Ticket.TicketNumber;
+}
+
+<div class="page-header">
+
+    <div>
+
+        <div class="page-eyebrow">
+            TICKET @Model.Ticket.TicketNumber
+        </div>
+
+        <h1>@Model.Ticket.Subject</h1>
+
+        <p class="page-subtitle">
+            Created by @Model.Ticket.CreatedBy?.FullName
+            on @Model.Ticket.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+        </p>
+
+    </div>
+
+    <div class="header-actions">
+
+        <a asp-action="Index"
+           class="btn btn-outline">
+            ← Back
+        </a>
+
+        @if (Model.Ticket.Status != EduSupport.Web.Models.Enums.TicketStatus.Closed)
+        {
+            <a asp-action="ChangeStatus"
+               asp-route-id="@Model.Ticket.Id"
+               class="btn btn-outline">
+                Change Status
+            </a>
+        }
+
+    </div>
+
+</div>
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+
+<!-- Main ticket information -->
+
+<div class="ticket-detail-grid">
+
+    <!-- LEFT -->
+
+    <div class="ticket-main-column">
+
+        <div class="card">
+
+            <div class="ticket-detail-header">
+
+                <div>
+
+                    <span class="badge status-@Model.Ticket.Status.ToString().ToLower()">
+                        @Model.Ticket.Status
+                    </span>
+
+                    <span class="badge priority-@Model.Ticket.Priority.ToString().ToLower()">
+                        @Model.Ticket.Priority
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="ticket-description">
+
+                <h3>Description</h3>
+
+                <p>
+                    @Model.Ticket.Description
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Comments -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h2>Conversation</h2>
+                    <p>Comments and responses</p>
+                </div>
+
+            </div>
+
+            <div class="comments-list">
+
+                @if (!Model.Comments.Any())
+                {
+                    <div class="empty-inline">
+                        No comments yet.
+                    </div>
+                }
+                else
+                {
+                    foreach (var comment in Model.Comments)
+                    {
+                        <div class="comment">
+
+                            <div class="avatar">
+                                @(comment.User?.FullName?.Substring(0, 1) ?? "?")
+                            </div>
+
+                            <div class="comment-body">
+
+                                <div class="comment-meta">
+
+                                    <strong>
+                                        @comment.User?.FullName
+                                    </strong>
+
+                                    <span>
+                                        @comment.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                    </span>
+
+                                </div>
+
+                                <div class="comment-message">
+                                    @comment.Message
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+            </div>
+
+
+            <!-- Add comment -->
+
+            <form asp-action="AddComment"
+                  method="post"
+                  class="comment-form">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="TicketId"
+                       value="@Model.Ticket.Id" />
+
+                <textarea name="Message"
+                          class="form-control"
+                          rows="4"
+                          placeholder="Write a reply..."></textarea>
+
+                <div class="comment-actions">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Add Comment
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- Activity -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h2>Activity History</h2>
+                    <p>Timeline of ticket events</p>
+                </div>
+
+            </div>
+
+            <div class="activity-timeline">
+
+                @if (!Model.Activities.Any())
+                {
+                    <div class="empty-inline">
+                        No activity recorded.
+                    </div>
+                }
+                else
+                {
+                    foreach (var activity in Model.Activities)
+                    {
+                        <div class="activity-item">
+
+                            <div class="activity-dot"></div>
+
+                            <div class="activity-content">
+
+                                <div class="activity-title">
+                                    @activity.Action
+                                </div>
+
+                                <div class="activity-details">
+                                    @activity.Details
+                                </div>
+
+                                <div class="activity-meta">
+                                    @activity.User?.FullName
+                                    ·
+                                    @activity.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT -->
+
+    <div class="ticket-sidebar">
+
+        <!-- Status -->
+
+        <div class="card">
+
+            <div class="detail-section">
+
+                <div class="detail-label">
+                    STATUS
+                </div>
+
+                <div>
+                    <span class="badge status-@Model.Ticket.Status.ToString().ToLower()">
+                        @Model.Ticket.Status
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="detail-section">
+
+                <div class="detail-label">
+                    PRIORITY
+                </div>
+
+                <div>
+                    <span class="badge priority-@Model.Ticket.Priority.ToString().ToLower()">
+                        @Model.Ticket.Priority
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="detail-section">
+
+                <div class="detail-label">
+                    CATEGORY
+                </div>
+
+                <div class="detail-value">
+                    @Model.Ticket.Category?.Name
+                </div>
+
+            </div>
+
+            <div class="detail-section">
+
+                <div class="detail-label">
+                    DEPARTMENT
+                </div>
+
+                <div class="detail-value">
+                    @(Model.Ticket.Department?.Name ?? "Not assigned")
+                </div>
+
+            </div>
+
+            <div class="detail-section">
+
+                <div class="detail-label">
+                    ASSIGNED TO
+                </div>
+
+                <div class="detail-value">
+
+                    @if (Model.Ticket.AssignedTo != null)
+                    {
+                        @Model.Ticket.AssignedTo.FullName
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            Unassigned
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SLA -->
+
+        <div class="card">
+
+            <div class="card-header">
+                <div>
+                    <h2>SLA</h2>
+                    <p>Service level tracking</p>
+                </div>
+            </div>
+
+            <div class="sla-panel">
+
+                <div class="sla-row">
+
+                    <span>Ticket Age</span>
+
+                    <strong>
+                        @Model.Age.Days d
+                        @Model.Age.Hours h
+                        @Model.Age.Minutes m
+                    </strong>
+
+                </div>
+
+                <div class="sla-row">
+
+                    <span>First Response</span>
+
+                    @if (Model.Ticket.FirstResponseAt.HasValue)
+                    {
+                        <strong>
+                            Responded
+                        </strong>
+                    }
+                    else if (Model.IsResponseBreached)
+                    {
+                        <strong class="sla-breached">
+                            Breached
+                        </strong>
+                    }
+                    else
+                    {
+                        <strong class="sla-normal">
+                            Within SLA
+                        </strong>
+                    }
+
+                </div>
+
+                <div class="sla-row">
+
+                    <span>Resolution</span>
+
+                    @if (Model.IsResolutionBreached)
+                    {
+                        <strong class="sla-breached">
+                            Breached
+                        </strong>
+                    }
+                    else if (Model.IsResolutionAtRisk)
+                    {
+                        <strong class="sla-risk">
+                            At Risk
+                        </strong>
+                    }
+                    else
+                    {
+                        <strong class="sla-normal">
+                            Within SLA
+                        </strong>
+                    }
+
+                </div>
+
+                <div class="sla-row">
+
+                    <span>Due</span>
+
+                    <strong>
+                        @(Model.Ticket.DueAt?.ToLocalTime()
+                            .ToString("dd MMM, hh:mm tt") ?? "—")
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Actions -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div>
+                    <h2>Actions</h2>
+                </div>
+
+            </div>
+
+            <div class="action-stack">
+
+                @if (Model.Ticket.Status != EduSupport.Web.Models.Enums.TicketStatus.Closed)
+                {
+                    <a asp-action="Assign"
+                       asp-route-id="@Model.Ticket.Id"
+                       class="btn btn-outline btn-full">
+                        Assign Ticket
+                    </a>
+                }
+
+                @if (Model.Ticket.Status != EduSupport.Web.Models.Enums.TicketStatus.Closed)
+                {
+                    <a asp-action="Resolve"
+                       asp-route-id="@Model.Ticket.Id"
+                       class="btn btn-primary btn-full">
+                        Resolve Ticket
+                    </a>
+                }
+
+                @if (Model.Ticket.Status == EduSupport.Web.Models.Enums.TicketStatus.Resolved)
+                {
+                    <form asp-action="Close"
+                          asp-route-id="@Model.Ticket.Id"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-success btn-full">
+                            Close Ticket
+                        </button>
+
+                    </form>
+                }
+
+                @if (Model.Ticket.Status == EduSupport.Web.Models.Enums.TicketStatus.Closed)
+                {
+                    <form asp-action="Reopen"
+                          asp-route-id="@Model.Ticket.Id"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-warning btn-full">
+                            Reopen Ticket
+                        </button>
+
+                    </form>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

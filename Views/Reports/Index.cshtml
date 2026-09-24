@@ -1,0 +1,256 @@
+﻿@model EduSupport.Web.ViewModels.ReportsViewModel
+
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="page-header mb-4">
+    <div>
+        <h1>Reports</h1>
+        <p class="text-muted mb-0">
+            Management overview of ticket volume, SLA performance and workload.
+        </p>
+    </div>
+</div>
+
+<!-- KPI CARDS -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">Total Tickets</div>
+                <h2>@Model.TotalTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">Open</div>
+                <h2>@Model.OpenTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">Pending</div>
+                <h2>@Model.PendingTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">Closed</div>
+                <h2>@Model.ClosedTickets</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">Resolved</div>
+                <h2>@Model.ResolvedTickets</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">SLA At Risk</div>
+                <h2>@Model.SlaAtRisk</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">SLA Breached</div>
+                <h2>@Model.SlaBreached</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card h-100">
+            <div class="card-body">
+                <div class="text-muted">Unassigned</div>
+                <h2>@Model.UnassignedTickets</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- PRIORITY + DEPARTMENT -->
+
+<div class="row g-4 mb-4">
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header">
+                <strong>Tickets by Priority</strong>
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Priority</th>
+                            <th class="text-end">Tickets</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.ByPriority)
+                        {
+                            <tr>
+                                <td>@item.Priority</td>
+                                <td class="text-end">
+                                    <strong>@item.Count</strong>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header">
+                <strong>Tickets by Department</strong>
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th class="text-end">Tickets</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.ByDepartment)
+                        {
+                            <tr>
+                                <td>@item.DepartmentName</td>
+                                <td class="text-end">
+                                    <strong>@item.Count</strong>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- STAFF WORKLOAD -->
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <strong>Staff Workload</strong>
+    </div>
+
+    <div class="card-body p-0">
+
+        @if (!Model.StaffWorkload.Any())
+        {
+            <div class="p-4 text-muted">
+                No assigned tickets available.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Staff</th>
+                            <th>Assigned</th>
+                            <th>Open</th>
+                            <th>Pending</th>
+                            <th>Resolved</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.StaffWorkload)
+                        {
+                            <tr>
+
+                                <td>
+                                    <strong>@item.StaffName</strong>
+                                </td>
+
+                                <td>
+                                    @item.AssignedTickets
+                                </td>
+
+                                <td>
+                                    @item.OpenTickets
+                                </td>
+
+                                <td>
+                                    @item.PendingTickets
+                                </td>
+
+                                <td>
+                                    @item.ResolvedTickets
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>

@@ -1,0 +1,200 @@
+﻿@model EduSupport.Web.ViewModels.TicketListViewModel
+
+@{
+    ViewData["Title"] = "Tickets";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-eyebrow">WORKSPACE</div>
+        <h1>Tickets</h1>
+        <p class="page-subtitle">
+            Manage student support requests and track their progress.
+        </p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        <span>+</span>
+        New Ticket
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Summary -->
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-icon">T</div>
+        <div>
+            <div class="stat-label">Total Tickets</div>
+            <div class="stat-value">@Model.TotalTickets</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">O</div>
+        <div>
+            <div class="stat-label">Open</div>
+            <div class="stat-value">@Model.OpenTickets</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">P</div>
+        <div>
+            <div class="stat-label">Pending</div>
+            <div class="stat-value">@Model.PendingTickets</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">R</div>
+        <div>
+            <div class="stat-label">Resolved</div>
+            <div class="stat-value">@Model.ResolvedTickets</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Ticket table -->
+<div class="card ticket-table-card">
+
+    <div class="card-header">
+        <div>
+            <h2>All Tickets</h2>
+            <p>Recent student support requests</p>
+        </div>
+    </div>
+
+    @if (!Model.Tickets.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-state-icon">+</div>
+            <h3>No tickets yet</h3>
+            <p>Create the first support ticket to get started.</p>
+
+            <a asp-action="Create"
+               class="btn btn-primary">
+                Create Ticket
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrapper">
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th>Subject</th>
+                        <th>Category</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Assigned To</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var ticket in Model.Tickets)
+                    {
+                        <tr>
+
+                            <td>
+                                <a asp-action="Details"
+                                   asp-route-id="@ticket.Id"
+                                   class="ticket-number">
+                                    @ticket.TicketNumber
+                                </a>
+                            </td>
+
+                            <td>
+                                <div class="ticket-subject">
+                                    @ticket.Subject
+                                </div>
+
+                                <div class="ticket-requester">
+                                    @ticket.CreatedBy?.FullName
+                                </div>
+                            </td>
+
+                            <td>
+                                @ticket.Category?.Name
+                            </td>
+
+                            <td>
+                                <span class="badge priority-@ticket.Priority.ToString().ToLower()">
+                                    @ticket.Priority
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge status-@ticket.Status.ToString().ToLower()">
+                                    @ticket.Status
+                                </span>
+                            </td>
+
+                            <td>
+                                @if (ticket.AssignedTo != null)
+                                {
+                                    <div class="user-cell">
+                                        <div class="avatar-small">
+                                            @ticket.AssignedTo.FullName.Substring(0, 1)
+                                        </div>
+
+                                        <span>
+                                            @ticket.AssignedTo.FullName
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Unassigned
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <span class="date-text">
+                                    @ticket.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")
+                                </span>
+                            </td>
+
+                            <td class="action-cell">
+                                <a asp-action="Details"
+                                   asp-route-id="@ticket.Id"
+                                   class="btn btn-sm btn-outline">
+                                    View
+                                </a>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</div>

@@ -1,0 +1,660 @@
+﻿@model EduSupport.Web.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header mb-4">
+
+    <div>
+        <h1>Dashboard</h1>
+
+        <p class="text-muted mb-0">
+            Support operations overview and ticket activity.
+        </p>
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- KPI CARDS -->
+<!-- ========================================================= -->
+
+<div class="row g-4 mb-4">
+
+
+    <!-- TOTAL -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="text-muted small">
+                            TOTAL TICKETS
+                        </div>
+
+                        <h2 class="mt-2 mb-0">
+                            @Model.TotalTickets
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-2">
+                        🎫
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- OPEN -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="text-muted small">
+                            OPEN
+                        </div>
+
+                        <h2 class="mt-2 mb-0">
+                            @Model.OpenTickets
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-2">
+                        📂
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PENDING -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="text-muted small">
+                            PENDING
+                        </div>
+
+                        <h2 class="mt-2 mb-0">
+                            @Model.PendingTickets
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-2">
+                        ⏳
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESOLVED -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <div class="text-muted small">
+                            RESOLVED
+                        </div>
+
+                        <h2 class="mt-2 mb-0">
+                            @Model.ResolvedTickets
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-2">
+                        ✅
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================================================= -->
+<!-- SLA + ACTION OVERVIEW -->
+<!-- ========================================================= -->
+
+<div class="row g-4 mb-4">
+
+
+    <!-- SLA ALERTS -->
+
+    <div class="col-lg-7">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header d-flex
+                justify-content-between
+                align-items-center">
+
+                <strong>
+                    SLA Attention
+                </strong>
+
+                @if (User.IsInRole("Manager") ||
+                     User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Sla"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-primary">
+
+                        View SLA Monitoring
+
+                    </a>
+                }
+
+            </div>
+
+
+            <div class="card-body">
+
+
+                @if (!Model.SlaAlerts.Any())
+                {
+                    <div class="text-center py-4">
+
+                        <div class="fs-1 mb-2">
+                            ✓
+                        </div>
+
+                        <h6>
+                            No SLA alerts
+                        </h6>
+
+                        <p class="text-muted mb-0">
+                            There are currently no tickets
+                            requiring SLA attention.
+                        </p>
+
+                    </div>
+                }
+                else
+                {
+
+                    <div class="list-group list-group-flush">
+
+                        @foreach (var alert in Model.SlaAlerts)
+                        {
+                            <a asp-controller="Tickets"
+                               asp-action="Details"
+                               asp-route-id="@alert.Ticket.Id"
+                               class="list-group-item
+                                list-group-item-action
+                                px-0">
+
+
+                                <div class="d-flex
+                                    justify-content-between
+                                    align-items-start">
+
+
+                                    <div>
+
+                                        <strong>
+                                            @alert.Ticket.TicketNumber
+                                        </strong>
+
+                                        <div class="small mt-1">
+                                            @alert.Ticket.Subject
+                                        </div>
+
+                                        <div class="small text-muted mt-1">
+
+                                            @alert.Ticket.Priority
+                                            ·
+                                            @alert.Ticket.Status
+
+                                            @if (alert.Ticket.AssignedTo != null)
+                                            {
+                                                <span>
+                                                    ·
+                                                    @alert.Ticket.AssignedTo.FullName
+                                                </span>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        @if (alert.IsBreached)
+                                        {
+                                            <span class="badge bg-danger">
+                                                SLA Breached
+                                            </span>
+                                        }
+                                        else if (alert.IsAtRisk)
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                At Risk
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </a>
+                        }
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- PENDING ACTIONS -->
+
+    <div class="col-lg-5">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header">
+
+                <strong>
+                    Pending Actions
+                </strong>
+
+            </div>
+
+
+            <div class="card-body">
+
+
+                @if (!Model.PendingActions.Any())
+                {
+                    <div class="text-center py-4">
+
+                        <div class="fs-1 mb-2">
+                            ✓
+                        </div>
+
+                        <h6>
+                            Nothing pending
+                        </h6>
+
+                        <p class="text-muted mb-0">
+                            No immediate actions are required.
+                        </p>
+
+                    </div>
+                }
+                else
+                {
+
+                    <div class="list-group list-group-flush">
+
+                        @foreach (var ticket in Model.PendingActions)
+                        {
+                            <a asp-controller="Tickets"
+                               asp-action="Details"
+                               asp-route-id="@ticket.Id"
+                               class="list-group-item
+                                list-group-item-action
+                                px-0">
+
+
+                                <div>
+
+                                    <strong>
+                                        @ticket.TicketNumber
+                                    </strong>
+
+                                    <div class="small mt-1">
+                                        @ticket.Subject
+                                    </div>
+
+                                    <div class="small text-muted mt-1">
+
+                                        @ticket.Status
+
+                                        @if (ticket.PendingReason.HasValue)
+                                        {
+                                            <span>
+                                                ·
+                                                @ticket.PendingReason
+                                            </span>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </a>
+                        }
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================================================= -->
+<!-- RECENT TICKETS -->
+<!-- ========================================================= -->
+
+<div class="card shadow-sm">
+
+    <div class="card-header d-flex
+        justify-content-between
+        align-items-center">
+
+        <strong>
+            Recent Tickets
+        </strong>
+
+        <a asp-controller="Tickets"
+           asp-action="Index"
+           class="btn btn-sm btn-outline-primary">
+
+            View All
+
+        </a>
+
+    </div>
+
+
+    <div class="card-body p-0">
+
+
+        @if (!Model.RecentTickets.Any())
+        {
+            <div class="p-4 text-center">
+
+                <div class="text-muted">
+                    No tickets have been created yet.
+                </div>
+
+            </div>
+        }
+        else
+        {
+
+            <div class="table-responsive">
+
+                <table class="table table-hover
+                    align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Ticket
+                            </th>
+
+                            <th>
+                                Subject
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                            <th>
+                                Priority
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Assigned To
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var ticket in Model.RecentTickets)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    <a asp-controller="Tickets"
+                                       asp-action="Details"
+                                       asp-route-id="@ticket.Id"
+                                       class="fw-semibold text-decoration-none">
+
+                                        @ticket.TicketNumber
+
+                                    </a>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span>
+                                        @ticket.Subject
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    @(ticket.Category?.Name ?? "—")
+
+                                </td>
+
+
+                                <td>
+
+                                    @switch (ticket.Priority)
+                                    {
+                                        case EduSupport.Web.Models.Enums.TicketPriority.Critical:
+
+                                            <span class="badge bg-danger">
+                                                Critical
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketPriority.High:
+
+                                            <span class="badge bg-warning text-dark">
+                                                High
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketPriority.Medium:
+
+                                            <span class="badge bg-primary">
+                                                Medium
+                                            </span>
+
+                                            break;
+
+                                        default:
+
+                                            <span class="badge bg-secondary">
+                                                Low
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <td>
+
+                                    @switch (ticket.Status)
+                                    {
+                                        case EduSupport.Web.Models.Enums.TicketStatus.New:
+
+                                            <span class="badge bg-secondary">
+                                                New
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketStatus.Assigned:
+
+                                            <span class="badge bg-info text-dark">
+                                                Assigned
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketStatus.InProgress:
+
+                                            <span class="badge bg-primary">
+                                                In Progress
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketStatus.Pending:
+
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketStatus.Resolved:
+
+                                            <span class="badge bg-success">
+                                                Resolved
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketStatus.Closed:
+
+                                            <span class="badge bg-dark">
+                                                Closed
+                                            </span>
+
+                                            break;
+
+                                        case EduSupport.Web.Models.Enums.TicketStatus.Reopened:
+
+                                            <span class="badge bg-danger">
+                                                Reopened
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <td>
+
+                                    @(ticket.AssignedTo?.FullName ?? "Unassigned")
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="text-muted">
+
+                                        @ticket.CreatedAt
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy, hh:mm tt")
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>

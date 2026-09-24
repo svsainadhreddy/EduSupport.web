@@ -1,0 +1,91 @@
+﻿@model EduSupport.Web.ViewModels.AssignTicketViewModel
+
+@{
+    ViewData["Title"] = "Assign Ticket";
+}
+
+<div class="page-header">
+
+    <div>
+        <div class="page-eyebrow">TICKET MANAGEMENT</div>
+        <h1>Assign Ticket</h1>
+        <p class="page-subtitle">
+            Assign this ticket to a support team member.
+        </p>
+    </div>
+
+    <a asp-action="Details"
+       asp-route-id="@Model.TicketId"
+       class="btn btn-outline">
+        ← Back
+    </a>
+
+</div>
+
+<div class="card form-card narrow-card">
+
+    <div class="card-header">
+
+        <div>
+            <h2>Assignment</h2>
+            <p>Select the staff member responsible for this ticket.</p>
+        </div>
+
+    </div>
+
+    <form asp-action="Assign"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               asp-for="TicketId" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="validation-summary">
+        </div>
+
+        <div class="form-group">
+
+            <label asp-for="StaffId"
+                   class="form-label">
+            </label>
+
+            <select asp-for="StaffId"
+                    asp-items="ViewBag.StaffUsers"
+                    class="form-control">
+
+                <option value="">
+                    Select staff member
+                </option>
+
+            </select>
+
+            <span asp-validation-for="StaffId"
+                  class="field-validation">
+            </span>
+
+        </div>
+
+        <div class="form-actions">
+
+            <a asp-action="Details"
+               asp-route-id="@Model.TicketId"
+               class="btn btn-outline">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Assign Ticket
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

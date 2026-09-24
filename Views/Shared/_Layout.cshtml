@@ -1,0 +1,446 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using EduSupport.Web.Models
+@inject UserManager<ApplicationUser> UserManager
+@using Microsoft.EntityFrameworkCore
+
+@{
+    ApplicationUser? currentUser = null;
+    string? currentRole = null;
+    User? domainUser = null;
+
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+
+        if (currentUser != null)
+        {
+            var roles = await UserManager.GetRolesAsync(currentUser);
+            currentRole = roles.FirstOrDefault();
+
+            if (currentUser.DomainUserId > 0)
+            {
+                using var scope =
+                    Context.RequestServices.CreateScope();
+
+                var dbContext =
+                    scope.ServiceProvider
+                        .GetRequiredService<EduSupport.Web.Data.ApplicationDbContext>();
+
+                domainUser =
+                    await dbContext.Users
+                        .Include(u => u.Department)
+                        .FirstOrDefaultAsync(
+                            u => u.Id == currentUser.DomainUserId);
+            }
+        }
+    }
+
+    var displayName =
+        domainUser?.FullName
+        ?? currentUser?.UserName
+        ?? "User";
+
+    var displayRole =
+        currentRole ?? "User";
+
+    var initials = string.IsNullOrWhiteSpace(displayName)
+        ? "U"
+        : string.Join(
+            "",
+            displayName
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Take(2)
+                .Select(x => x[0]))
+            .ToUpper();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - EduSupport</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/EduSupport.web.styles.css"
+          asp-append-version="true" />
+
+</head>
+
+<body>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="app-shell">
+
+        <!-- ================= SIDEBAR ================= -->
+
+        <aside class="sidebar">
+
+            <!-- Brand -->
+
+            <div class="sidebar-brand">
+
+                <div class="brand-icon">
+                    ES
+                </div>
+
+                <div class="brand-text">
+
+                    <div class="brand-name">
+                        EduSupport
+                    </div>
+
+                    <div class="brand-subtitle">
+                        Support Portal
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Navigation -->
+
+            <nav class="sidebar-nav">
+
+                <!-- ================= WORKSPACE ================= -->
+
+                <div class="nav-section-title">
+                    WORKSPACE
+                </div>
+
+
+                <!-- Dashboard - Everyone -->
+
+                <a class="sidebar-link"
+                   asp-controller="Dashboard"
+                   asp-action="Index">
+
+                    <span class="nav-icon">▦</span>
+
+                    <span>
+                        Dashboard
+                    </span>
+
+                </a>
+
+
+                <!-- ================= STUDENT ================= -->
+
+                @if (User.IsInRole("Student"))
+                {
+                    <a class="sidebar-link"
+                       asp-controller="Tickets"
+                       asp-action="Index">
+
+                        <span class="nav-icon">☷</span>
+
+                        <span>
+                            My Tickets
+                        </span>
+
+                    </a>
+
+
+                    <a class="sidebar-link"
+                       asp-controller="Tickets"
+                       asp-action="Create">
+
+                        <span class="nav-icon">＋</span>
+
+                        <span>
+                            New Ticket
+                        </span>
+
+                    </a>
+                }
+
+
+                <!-- ================= STAFF ================= -->
+
+                @if (User.IsInRole("Staff"))
+                {
+                    <a class="sidebar-link"
+                       asp-controller="Tickets"
+                       asp-action="Index">
+
+                        <span class="nav-icon">☷</span>
+
+                        <span>
+                            My Queue
+                        </span>
+
+                    </a>
+                }
+
+
+                <!-- ================= MANAGEMENT ================= -->
+
+                @if (User.IsInRole("Manager") ||
+                     User.IsInRole("Admin"))
+                {
+                    <div class="nav-section-title mt-4">
+                        MANAGEMENT
+                    </div>
+
+
+                    <a class="sidebar-link"
+                       asp-controller="Tickets"
+                       asp-action="Index">
+
+                        <span class="nav-icon">▤</span>
+
+                        <span>
+                            All Tickets
+                        </span>
+
+                    </a>
+
+
+                    <a class="sidebar-link"
+                       asp-controller="Sla"
+                       asp-action="Index">
+
+                        <span class="nav-icon">◷</span>
+
+                        <span>
+                            SLA Monitoring
+                        </span>
+
+                    </a>
+
+
+                    <a class="sidebar-link"
+                       asp-controller="Reports"
+                       asp-action="Index">
+
+                        <span class="nav-icon">▥</span>
+
+                        <span>
+                            Reports
+                        </span>
+
+                    </a>
+                }
+
+
+                <!-- ================= ADMINISTRATION ================= -->
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="nav-section-title mt-4">
+                        ADMINISTRATION
+                    </div>
+
+
+                    <a class="sidebar-link"
+                       asp-controller="Admin"
+                       asp-action="Index">
+
+                        <span class="nav-icon">⚙</span>
+
+                        <span>
+                            Settings
+                        </span>
+
+                    </a>
+                }
+
+            </nav>
+
+
+            <!-- Sidebar bottom -->
+
+            <div class="sidebar-bottom">
+
+                <div class="help-card">
+
+                    <div class="help-title">
+                        Need help?
+                    </div>
+
+                    <div class="help-text">
+                        Contact your administrator for support.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================= MAIN AREA ================= -->
+
+        <div class="main-wrapper">
+
+
+            <!-- ================= TOPBAR ================= -->
+
+            <header class="topbar">
+
+                <div class="topbar-left">
+
+                    <button class="mobile-menu-button"
+                            type="button"
+                            id="sidebarToggle">
+
+                        ☰
+
+                    </button>
+
+
+                    <div class="page-context">
+
+                        <span class="page-context-label">
+                            Support Center
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="topbar-right">
+
+
+                    <!-- Search -->
+
+                    <div class="topbar-search">
+
+                        <span class="search-icon">
+                            ⌕
+                        </span>
+
+                        <input type="text"
+                               placeholder="Search tickets..." />
+
+                    </div>
+
+
+                    <!-- Notification -->
+
+                    <button class="topbar-icon-button"
+                            type="button"
+                            title="Notifications">
+
+                        ♧
+
+                        <span class="notification-dot"></span>
+
+                    </button>
+
+
+                    <!-- User -->
+
+                    <div class="user-menu">
+
+                        <div class="user-avatar">
+                            @initials
+                        </div>
+
+                        <div class="user-info">
+
+                            <div class="user-name">
+                                @displayName
+                            </div>
+
+                            <div class="user-role">
+                                @displayRole
+                            </div>
+
+                        </div>
+
+                        <span class="user-chevron">
+                            ▾
+                        </span>
+
+                    </div>
+
+
+                    <!-- Logout -->
+
+                    <form asp-controller="Account"
+                          asp-action="Logout"
+                          method="post"
+                          class="logout-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="logout-button"
+                                title="Sign out">
+
+                            Sign out
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </header>
+
+
+            <!-- ================= PAGE CONTENT ================= -->
+
+            <main class="main-content">
+
+                @RenderBody()
+
+            </main>
+
+
+            <!-- ================= FOOTER ================= -->
+
+            <footer class="app-footer">
+
+                <span>
+                    © 2026 EduSupport
+                </span>
+
+                <span>
+                    Support Management Platform
+                </span>
+
+            </footer>
+
+        </div>
+
+    </div>
+}
+else
+{
+    <!-- Login / Public Pages -->
+
+    <main>
+        @RenderBody()
+    </main>
+}
+
+
+<!-- ================= SCRIPTS ================= -->
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="~/js/site.js"
+        asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

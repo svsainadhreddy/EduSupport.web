@@ -1,0 +1,174 @@
+﻿@model EduSupport.Web.ViewModels.SlaMonitoringViewModel
+
+@{
+    ViewData["Title"] = "SLA Monitoring";
+}
+
+<div class="page-header">
+    <div>
+        <h1>SLA Monitoring</h1>
+        <p class="text-muted">
+            Monitor open tickets, SLA risk, breaches and ageing.
+        </p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-3">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="text-muted">Total Open</div>
+                <h2>@Model.TotalOpen</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="text-muted">Normal</div>
+                <h2>@Model.Normal</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="text-muted">At Risk</div>
+                <h2>@Model.AtRisk</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <div class="text-muted">Breached</div>
+                <h2>@Model.Breached</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+        <strong>SLA Tickets</strong>
+    </div>
+
+    <div class="card-body p-0">
+
+        @if (!Model.Tickets.Any())
+        {
+            <div class="p-4 text-muted">
+                No open tickets require SLA monitoring.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Ticket</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>SLA</th>
+                            <th>Due</th>
+                            <th>Age</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var ticket in Model.Tickets)
+                        {
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        @ticket.TicketNumber
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    @ticket.Subject
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        @ticket.Priority
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @ticket.Status
+                                </td>
+
+                                <td>
+                                    @(ticket.AssignedTo ?? "Unassigned")
+                                </td>
+
+                                <td>
+
+                                    @if (ticket.IsBreached)
+                                    {
+                                        <span class="badge bg-danger">
+                                            Breached
+                                        </span>
+                                    }
+                                    else if (ticket.IsAtRisk)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            At Risk
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">
+                                            Normal
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    @(ticket.DueAt?
+                                        .ToLocalTime()
+                                        .ToString("dd MMM, hh:mm tt")
+                                        ?? "—")
+                                </td>
+
+                                <td>
+                                    @($"{(int)ticket.Age.TotalHours}h {ticket.Age.Minutes}m")
+                                </td>
+
+                                <td>
+                                    <a asp-controller="Tickets"
+                                       asp-action="Details"
+                                       asp-route-id="@ticket.TicketId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+</div>

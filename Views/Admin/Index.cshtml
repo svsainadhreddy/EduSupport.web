@@ -1,0 +1,835 @@
+﻿@model EduSupport.Web.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="page-header mb-4">
+
+    <div>
+
+        <h1>Settings</h1>
+
+        <p class="text-muted mb-0">
+            Manage support categories, departments, SLA policies and users.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- ALERTS -->
+<!-- ========================================================= -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show"
+         role="alert">
+
+        @TempData["Success"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+
+        @TempData["Error"]
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+        </button>
+
+    </div>
+}
+
+
+
+<!-- ========================================================= -->
+<!-- CATEGORIES & DEPARTMENTS -->
+<!-- ========================================================= -->
+
+<div class="row g-4">
+
+
+    <!-- ===================================================== -->
+    <!-- CATEGORIES -->
+    <!-- ===================================================== -->
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header">
+
+                <strong>
+                    Categories
+                </strong>
+
+            </div>
+
+
+            <div class="card-body">
+
+
+                <!-- ADD CATEGORY -->
+
+                <form asp-action="AddCategory"
+                      method="post"
+                      class="mb-4">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Category Name
+                        </label>
+
+                        <input type="text"
+                               name="name"
+                               class="form-control"
+                               placeholder="e.g. Library"
+                               maxlength="100"
+                               required />
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+                        <textarea name="description"
+                                  class="form-control"
+                                  rows="2"
+                                  maxlength="500"
+                                  placeholder="Optional description"></textarea>
+
+                    </div>
+
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Add Category
+
+                    </button>
+
+                </form>
+
+
+                <hr />
+
+
+                <!-- EXISTING CATEGORIES -->
+
+                <h6 class="mb-3">
+                    Existing Categories
+                </h6>
+
+
+                @if (!Model.Categories.Any())
+                {
+                    <div class="text-muted">
+                        No categories available.
+                    </div>
+                }
+                else
+                {
+
+                    @foreach (var category in Model.Categories)
+                    {
+                        <div class="d-flex
+                            justify-content-between
+                            align-items-center
+                            border-bottom
+                            py-3">
+
+
+                            <div>
+
+                                <strong>
+                                    @category.Name
+                                </strong>
+
+
+                                @if (!string.IsNullOrWhiteSpace(
+                                    category.Description))
+                                {
+                                    <div class="small text-muted">
+
+                                        @category.Description
+
+                                    </div>
+                                }
+
+                            </div>
+
+
+                            <form asp-action="ToggleCategory"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@category.Id" />
+
+
+                                @if (category.IsActive)
+                                {
+                                    <button type="submit"
+                                            class="btn btn-sm btn-success">
+
+                                        Active
+
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit"
+                                            class="btn btn-sm btn-secondary">
+
+                                        Inactive
+
+                                    </button>
+                                }
+
+                            </form>
+
+                        </div>
+                    }
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- DEPARTMENTS -->
+    <!-- ===================================================== -->
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header">
+
+                <strong>
+                    Departments
+                </strong>
+
+            </div>
+
+
+            <div class="card-body">
+
+
+                <!-- ADD DEPARTMENT -->
+
+                <form asp-action="AddDepartment"
+                      method="post"
+                      class="mb-4">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Department Name
+                        </label>
+
+                        <input type="text"
+                               name="name"
+                               class="form-control"
+                               placeholder="e.g. Library"
+                               maxlength="100"
+                               required />
+
+                    </div>
+
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Add Department
+
+                    </button>
+
+                </form>
+
+
+                <hr />
+
+
+                <!-- EXISTING DEPARTMENTS -->
+
+                <h6 class="mb-3">
+                    Existing Departments
+                </h6>
+
+
+                @if (!Model.Departments.Any())
+                {
+                    <div class="text-muted">
+                        No departments available.
+                    </div>
+                }
+                else
+                {
+
+                    @foreach (var department in Model.Departments)
+                    {
+                        <div class="d-flex
+                            justify-content-between
+                            align-items-center
+                            border-bottom
+                            py-3">
+
+
+                            <div>
+
+                                <strong>
+                                    @department.Name
+                                </strong>
+
+                            </div>
+
+
+                            <form asp-action="ToggleDepartment"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@department.Id" />
+
+
+                                @if (department.IsActive)
+                                {
+                                    <button type="submit"
+                                            class="btn btn-sm btn-success">
+
+                                        Active
+
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit"
+                                            class="btn btn-sm btn-secondary">
+
+                                        Inactive
+
+                                    </button>
+                                }
+
+                            </form>
+
+                        </div>
+                    }
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================================================= -->
+<!-- SLA POLICIES -->
+<!-- ========================================================= -->
+
+<div class="card shadow-sm mt-4">
+
+
+    <div class="card-header">
+
+        <strong>
+            SLA Policies
+        </strong>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+        <p class="text-muted mb-4">
+
+            Configure first-response and resolution targets
+            for each ticket priority.
+
+        </p>
+
+
+        @if (!Model.SlaPolicies.Any())
+        {
+            <div class="alert alert-warning mb-0">
+
+                No SLA policies have been configured.
+
+            </div>
+        }
+        else
+        {
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Priority
+                            </th>
+
+                            <th>
+                                First Response
+                            </th>
+
+                            <th>
+                                Resolution
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var policy in Model.SlaPolicies)
+                        {
+                            var formId =
+                                $"sla-form-{policy.Id}";
+
+
+                            <tr>
+
+
+                                <!-- PRIORITY -->
+
+                                <td>
+
+                                    <strong>
+                                        @policy.Priority
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- FIRST RESPONSE -->
+
+                                <td>
+
+                                    <div class="d-flex
+                                        align-items-center
+                                        gap-2">
+
+
+                                        <input type="number"
+                                               form="@formId"
+                                               name="firstResponseMinutes"
+                                               value="@policy.FirstResponseMinutes"
+                                               min="1"
+                                               max="10080"
+                                               class="form-control"
+                                               style="width: 120px;"
+                                               required />
+
+
+                                        <span class="text-muted">
+                                            min
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- RESOLUTION -->
+
+                                <td>
+
+                                    <div class="d-flex
+                                        align-items-center
+                                        gap-2">
+
+
+                                        <input type="number"
+                                               form="@formId"
+                                               name="resolutionMinutes"
+                                               value="@policy.ResolutionMinutes"
+                                               min="1"
+                                               max="43200"
+                                               class="form-control"
+                                               style="width: 120px;"
+                                               required />
+
+
+                                        <span class="text-muted">
+                                            min
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    @if (policy.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+
+                                            Active
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+
+                                            Inactive
+
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ACTION -->
+
+                                <td>
+
+                                    <form id="@formId"
+                                          asp-action="UpdateSlaPolicy"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@policy.Id" />
+
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            Save
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>
+
+
+
+<!-- ========================================================= -->
+<!-- USER MANAGEMENT -->
+<!-- ========================================================= -->
+
+<div class="card shadow-sm mt-4">
+
+
+    <div class="card-header">
+
+        <strong>
+            User Management
+        </strong>
+
+    </div>
+
+
+    <div class="card-body">
+
+
+        <p class="text-muted mb-4">
+
+            View support portal users and manage account activation.
+
+        </p>
+
+
+        @if (!Model.Users.Any())
+        {
+            <div class="alert alert-warning mb-0">
+
+                No users have been configured.
+
+            </div>
+        }
+        else
+        {
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Department
+                            </th>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+
+
+                                <!-- NAME -->
+
+                                <td>
+
+                                    <strong>
+                                        @user.FullName
+                                    </strong>
+
+                                </td>
+
+
+                                <!-- EMAIL -->
+
+                                <td>
+
+                                    <span class="text-muted">
+                                        @user.Email
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ROLE -->
+
+                                <td>
+
+                                    @switch (user.Role)
+                                    {
+                                        case EduSupport.Web.Models.Enums.UserRole.Student:
+
+                                            <span class="badge bg-info text-dark">
+                                                Student
+                                            </span>
+
+                                            break;
+
+
+                                        case EduSupport.Web.Models.Enums.UserRole.Staff:
+
+                                            <span class="badge bg-primary">
+                                                Staff
+                                            </span>
+
+                                            break;
+
+
+                                        case EduSupport.Web.Models.Enums.UserRole.Manager:
+
+                                            <span class="badge bg-warning text-dark">
+                                                Manager
+                                            </span>
+
+                                            break;
+
+
+                                        case EduSupport.Web.Models.Enums.UserRole.Admin:
+
+                                            <span class="badge bg-dark">
+                                                Admin
+                                            </span>
+
+                                            break;
+                                    }
+
+                                </td>
+
+
+                                <!-- DEPARTMENT -->
+
+                                <td>
+
+                                    @(user.Department?.Name ?? "—")
+
+                                </td>
+
+
+                                <!-- ID -->
+
+                                <td>
+
+                                    @(user.StudentId
+                                        ?? user.EmployeeId
+                                        ?? "—")
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+
+                                            Active
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+
+                                            Inactive
+
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <!-- ACTION -->
+
+                                <td>
+
+                                    <form asp-action="ToggleUser"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@user.Id" />
+
+
+                                        @if (user.IsActive)
+                                        {
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+
+                                                Deactivate
+
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-success">
+
+                                                Activate
+
+                                            </button>
+                                        }
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>

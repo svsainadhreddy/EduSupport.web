@@ -1,0 +1,88 @@
+﻿@model EduSupport.Web.ViewModels.ResolveTicketViewModel
+
+@{
+    ViewData["Title"] = "Resolve Ticket";
+}
+
+<div class="page-header">
+
+    <div>
+        <div class="page-eyebrow">RESOLUTION</div>
+        <h1>Resolve Ticket</h1>
+        <p class="page-subtitle">
+            Record how the issue was resolved.
+        </p>
+    </div>
+
+    <a asp-action="Details"
+       asp-route-id="@Model.TicketId"
+       class="btn btn-outline">
+        ← Back
+    </a>
+
+</div>
+
+<div class="card form-card narrow-card">
+
+    <div class="card-header">
+
+        <div>
+            <h2>Resolution Summary</h2>
+            <p>
+                Provide a clear explanation of the resolution.
+            </p>
+        </div>
+
+    </div>
+
+    <form asp-action="Resolve"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               asp-for="TicketId" />
+
+        <div asp-validation-summary="ModelOnly"
+             class="validation-summary">
+        </div>
+
+        <div class="form-group">
+
+            <label asp-for="ResolutionSummary"
+                   class="form-label">
+            </label>
+
+            <textarea asp-for="ResolutionSummary"
+                      class="form-control textarea-large"
+                      placeholder="Explain what was done to resolve the issue...">
+            </textarea>
+
+            <span asp-validation-for="ResolutionSummary"
+                  class="field-validation">
+            </span>
+
+        </div>
+
+        <div class="form-actions">
+
+            <a asp-action="Details"
+               asp-route-id="@Model.TicketId"
+               class="btn btn-outline">
+                Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Mark as Resolved
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
