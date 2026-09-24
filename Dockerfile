@@ -4,9 +4,9 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet restore "EduSupport.Web.csproj"
+RUN dotnet restore "EduSupport.web.csproj"
 
-RUN dotnet publish "EduSupport.Web.csproj" \
+RUN dotnet publish "EduSupport.web.csproj" \
     -c Release \
     -o /app/publish \
     /p:UseAppHost=false
@@ -21,4 +21,4 @@ ENV ASPNETCORE_URLS=http://0.0.0.0:10000
 
 EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "EduSupport.Web.dll"]
+ENTRYPOINT ["dotnet", "EduSupport.web.dll"]
